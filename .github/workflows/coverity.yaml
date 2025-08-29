@@ -1,9 +1,6 @@
 name: Coverity scan
 
-on:
-  push:
-    branches:
-    - '**'
+on: [workflow_dispatch]
 
 jobs:
   coverity-codescan:
