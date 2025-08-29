@@ -1,0 +1,68 @@
+name: Trivy Hybrid Scan
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  trivy-hybrid-scan:
+    runs-on: ubuntu-latest 
+    permissions:
+      id-token: write
+      contents: read 
+    outputs:
+      trivy-job-output-critical: ${{ steps.trivy-step.outputs.critical-count }}
+      trivy-job-output-very-high: ${{ steps.trivy-step.outputs.very-high-count }}
+      trivy-job-output-high: ${{ steps.trivy-step.outputs.high-count }}
+      trivy-job-output-medium: ${{ steps.trivy-step.outputs.medium-count }}
+      trivy-job-output-low: ${{ steps.trivy-step.outputs.low-count }}
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Print GITHUB_RUN_ID
+        run: echo "Ref name is $GITHUB_RUN_ID"
+
+      - name: Create empty JSON file in workspace
+        run: |
+          FILE_PATH="$GITHUB_WORKSPACE/store/request/request.json"
+          mkdir -p "$(dirname "$FILE_PATH")"
+          touch "$FILE_PATH"
+          echo "File created at: $FILE_PATH"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker image
+        run: |
+          docker build -t myapp:latest .
+
+      # Step 4: Save the Docker image as a TAR file
+      - name: Save Docker image as TAR file
+        run: |
+          docker save -o output.tar myapp:latest
+          tar -tf output.tar
+
+      - id: trivy-step
+        name: Run Trivy scan
+        uses: cloudbees-io-gha/trivy-scan-publish@v2
+        with:
+          binary-tar-path: output.tar
+          cloudbees-url: ${{ vars.CLOUDBEES_PREPROD_API_URL }}
+          run_id: "14377182881"
+          job_id: $JOB_ID
+          step_id: $STEP_ID 
+
+      - id: print-outputs-from-trivy-step
+        name: Print outputs from upstream trivy step
+        shell: bash
+        run: |
+            #printing all outputs
+            echo "Outputs from upstream trivy step:"
+            echo "Critical Count: ${{steps.trivy-step.outputs.critical-count}}"
+            echo "Very High Count: ${{steps.trivy-step.outputs.very-high-count}}"
+            echo "High Count: ${{steps.trivy-step.outputs.high-count}}"
+            echo "Medium Count: ${{steps.trivy-step.outputs.medium-count}}"
+            echo "Low Count: ${{steps.trivy-step.outputs.low-count}}"
