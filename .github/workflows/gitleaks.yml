@@ -31,8 +31,8 @@ jobs:
       - id: gitleaks-step
         name: Gitleaks scan
         uses: cloudbees-io-gha/gitleaks-scan-publish@v1
-        with:
-          cloudbees-url: ${{ vars.CLOUDBEES_PREPROD_API_URL }}
+        # with:
+          # cloudbees-url: ${{ vars.CLOUDBEES_PREPROD_API_URL }}
 
       - id: print-outputs-from-gitleaks-step
         name: Print outputs from upstream gitleaks step
