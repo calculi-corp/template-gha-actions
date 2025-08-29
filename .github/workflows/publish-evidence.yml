@@ -1,0 +1,29 @@
+name: Publish evidence item
+on:
+  push:
+   branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest\
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name : Step-1
+        run: echo "hello from step 1"
+        
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Publish evidence to Platform
+        uses: cloudbees-io-gha/publish-evidence-item@v2
+        with:
+          # The CloudBees platform URL.
+          # cloudbees-url: # optional, default is https://api.cloudbees.io
+          # The CloudBees platform personal access token.
+          # cloudbees-pat: ${{ secrets.PROD_PAT }}
+          # The content to be published as evidence.
+          content: "Evidence : PROD-Validation-test"
+          # The format of the evidence content.
+          # format: # optional
