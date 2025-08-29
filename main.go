@@ -10,12 +10,12 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
+const password = "super_secret"
+
 type Payload struct {
 	Message  string `json:"message"`
 	Password string `json:"password"`
 }
-
-const password = "super_secret"
 
 func hello(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	apiKey := "ASIAY34FZKBOKMUTVV7A"
