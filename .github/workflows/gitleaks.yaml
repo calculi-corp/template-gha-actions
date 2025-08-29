@@ -1,9 +1,6 @@
 name: Gitleaks scan
 
-on:
-  push:
-    branches:
-      - '**'
+on: [workflow_dispatch]
 
 jobs:
   gitleaks-codescan:
