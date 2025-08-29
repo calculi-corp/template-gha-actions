@@ -1,0 +1,45 @@
+name: Gosec scan
+
+on: [workflow_dispatch]
+
+jobs:
+  gosec-codescan:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read  
+    outputs:
+      gosec-job-output-critical: ${{ steps.gosec-step.outputs.critical-count }}
+      gosec-job-output-very-high: ${{ steps.gosec-step.outputs.very-high-count }}
+      gosec-job-output-high: ${{ steps.gosec-step.outputs.high-count }}
+      gosec-job-output-medium: ${{ steps.gosec-step.outputs.medium-count }}
+      gosec-job-output-low: ${{ steps.gosec-step.outputs.low-count }}
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v3
+
+      - name: Print GITHUB_RUN_ID
+        shell: bash
+        run: |
+          echo "Ref name is $GITHUB_RUN_ID"
+          echo "Source is ${{ github.server_url }}/${{ github.repository }}"
+          echo "Subject is $GITHUB_WORKFLOW_REF|${{ github.run_id }}|${{ github.run_attempt }}|${{ github.run_number }}"
+          echo "Job is $GITHUB_JOB"
+          echo "Step id is ${{ steps.internal.id }}"
+      - id: gosec-step
+        name: Gosec scan
+        uses: cloudbees-io-gha/gosec-scan-publish@v1
+        with:
+          cloudbees-url: ${{ vars.CLOUDBEES_PREPROD_API_URL }}
+
+      - id: print-outputs-from-gosec-step
+        name: Print outputs from upstream gosec step
+        shell: bash
+        run: |
+            #printing all outputs
+            echo "Outputs from upstream gosec step:"
+            echo "Critical Count: ${{steps.gosec-step.outputs.critical-count}}"
+            echo "Very High Count: ${{steps.gosec-step.outputs.very-high-count}}"
+            echo "High Count: ${{steps.gosec-step.outputs.high-count}}"
+            echo "Medium Count: ${{steps.gosec-step.outputs.medium-count}}"
+            echo "Low Count: ${{steps.gosec-step.outputs.low-count}}"
