@@ -29,8 +29,6 @@ jobs:
       - id: gosec-step
         name: Gosec scan
         uses: cloudbees-io-gha/gosec-scan-publish@v1
-        with:
-          cloudbees-url: ${{ vars.CLOUDBEES_PREPROD_API_URL }}
 
       - id: print-outputs-from-gosec-step
         name: Print outputs from upstream gosec step

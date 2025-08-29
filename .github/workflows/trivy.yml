@@ -47,7 +47,6 @@ jobs:
         uses: cloudbees-io-gha/trivy-scan-publish@v2
         with:
           binary-tar-path: output.tar
-          cloudbees-url: ${{ vars.CLOUDBEES_PREPROD_API_URL }}
           run_id: "14377182881"
           job_id: $JOB_ID
           step_id: $STEP_ID 
