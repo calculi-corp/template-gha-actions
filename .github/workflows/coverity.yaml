@@ -1,0 +1,54 @@
+name: Coverity scan
+
+on:
+  push:
+    branches:
+    - '**'
+
+jobs:
+  coverity-codescan:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read 
+    outputs:
+      coverity-job-output-critical: ${{ steps.coverity-step.outputs.critical-count }}
+      coverity-job-output-very-high: ${{ steps.coverity-step.outputs.very-high-count }}
+      coverity-job-output-high: ${{ steps.coverity-step.outputs.high-count }}
+      coverity-job-output-medium: ${{ steps.coverity-step.outputs.medium-count }}
+      coverity-job-output-low: ${{ steps.coverity-step.outputs.low-count }}
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v3
+
+      - name: Print GITHUB_RUN_ID
+        shell: bash
+        run: |
+          echo "Ref name is $GITHUB_RUN_ID"
+          echo "Source is ${{ github.server_url }}/${{ github.repository }}"
+          echo "Subject is $GITHUB_WORKFLOW_REF|${{ github.run_id }}|${{ github.run_attempt }}|${{ github.run_number }}"
+          echo "Job is $GITHUB_JOB"
+          echo "Step id is ${{ steps.internal.id }}"
+
+      - id: coverity-step
+        name: Coverity scan
+        uses: cloudbees-io-gha/coverity-scan-publish@v2
+        with:
+          cloudbees-url: ${{ vars.CLOUDBEES_PREPROD_API_URL }}
+          step-id: "coverity-scan"
+          server-url: ${{ vars.COVERITY_SERVER_URL }}
+          api-token: ${{ secrets.COVERITY_API_TOKEN_V }}
+
+      - id: print-outputs-from-coverity-step
+        name: Print outputs from upstream coverity step
+        shell: bash
+        run: |
+            #printing all outputs
+            echo "Outputs from upstream coverity step:"
+            echo "Critical Count: ${{steps.coverity-step.outputs.critical-count}}"
+            echo "Very High Count: ${{steps.coverity-step.outputs.very-high-count}}"
+            echo "High Count: ${{steps.coverity-step.outputs.high-count}}"
+            echo "Medium Count: ${{steps.coverity-step.outputs.medium-count}}"
+            echo "Low Count: ${{steps.coverity-step.outputs.low-count}}"
+
+
