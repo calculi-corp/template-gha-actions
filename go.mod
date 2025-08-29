@@ -1,6 +1,6 @@
 module github.com/calculi-corp/template-gha-actions
 
-go 1.25.0
+go 1.23.12
 
 require (
 	github.com/julienschmidt/httprouter v1.3.0
