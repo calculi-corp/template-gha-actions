@@ -46,7 +46,6 @@ jobs:
         name: Grype scan
         uses: cloudbees-io-gha/grype-scan-publish@v1
         with:
-          cloudbees-url: ${{ vars.CLOUDBEES_PREPROD_API_URL }}
           binary-tar-path: output.tar
 
       - id: print-outputs-from-grype-step

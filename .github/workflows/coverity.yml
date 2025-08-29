@@ -31,7 +31,6 @@ jobs:
         name: Coverity scan
         uses: cloudbees-io-gha/coverity-scan-publish@v2
         with:
-          cloudbees-url: ${{ vars.CLOUDBEES_PREPROD_API_URL }}
           step-id: "coverity-scan"
           server-url: ${{ vars.COVERITY_SERVER_URL }}
           api-token: ${{ secrets.COVERITY_API_TOKEN_V }}
