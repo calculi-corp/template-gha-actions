@@ -1,9 +1,6 @@
 name: Trivy Hybrid Scan
 
-on:
-  push:
-    branches:
-      - '**'
+on: [workflow_dispatch]
 
 jobs:
   trivy-hybrid-scan:
