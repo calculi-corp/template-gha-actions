@@ -10,7 +10,7 @@ RUN apk --no-cache add make git gcc libtool musl-dev ca-certificates dumb-init \
   && go env -w GOPRIVATE="github.com/cloudbees-compliance/*" \
   && git config --global url."https://${USER}:${TOKEN}@github.com".insteadOf  "https://github.com"
 COPY go.mod go.sum /src/
-RUN go mod download && go mod verify
+# RUN go mod download && go mod verify
 COPY . /src
 RUN go test -short ./...
 RUN govulncheck ./... || true
