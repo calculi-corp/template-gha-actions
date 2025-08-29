@@ -1,9 +1,6 @@
 name: Gosec scan
 
-on:
-  push:
-    branches:
-    - '**'
+on: [workflow_dispatch]
 
 jobs:
   gosec-codescan:
