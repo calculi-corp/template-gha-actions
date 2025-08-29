@@ -1,9 +1,6 @@
 name: Grype scan
 
-on:
-  push:
-    branches:
-    - '**'
+on: [workflow_dispatch]
 
 jobs:
   grype-codescan:
