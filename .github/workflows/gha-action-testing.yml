@@ -1,6 +1,6 @@
 name: GHA action testing
 
-on: [workflow_dispatch]
+on: [workflow_dispatch, push]
 
 permissions:
   id-token: write
