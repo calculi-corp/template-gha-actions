@@ -1,0 +1,44 @@
+apiVersion: automation.cloudbees.io/v1alpha1
+kind: action
+name: Notify slack action
+inputs:
+  action-name:
+    required: true
+    description: 'The name of the action'
+  webhook-url:
+    required: true
+    description: 'The Slack webhook URL'
+
+runs:
+  using: composite
+  steps:
+    - name: Send failure notification to Slack
+      uses: docker://golang:1.23.0
+      shell: sh
+      run: |
+
+        REPO_URL="${{ cloudbees.scm.repositoryUrl }}"
+        # Remove the .git suffix from the repo URL (if present)
+        REPO_URL_CLEAN=${REPO_URL%.git}
+        # Construct the final URL
+        WORKFLOW_URL="$REPO_URL_CLEAN/blob/${{ cloudbees.scm.branch }}/.cloudbees/workflows/${{ inputs.action-name }}.yaml"
+
+        # Send the notification to Slack channel
+        curl -X POST -H 'Content-type: application/json' --data '{
+          "text": "
+          The following action workflow run has failed. :x:",
+          "attachments": [
+            {
+              "color": "#ff0000",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Action:* `${{ inputs.action-name }}`\n*Status:* Failed :warning:\n*Job:* `${{ job.id }}`\n*Workflow:* '"$WORKFLOW_URL"'\n*Branch:* `${{ cloudbees.scm.branch }}`"
+                  }
+                }
+              ]
+            }
+          ]
+        }' ${{ inputs.webhook-url }}

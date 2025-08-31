@@ -1,4 +1,4 @@
-name: Gitleaks scan
+name: gitleaks-scan-publish
 
 on: [workflow_dispatch]
 

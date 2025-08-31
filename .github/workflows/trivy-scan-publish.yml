@@ -1,4 +1,4 @@
-name: Trivy Hybrid Scan
+name: trivy-scan-publish
 
 on: [workflow_dispatch]
 

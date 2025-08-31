@@ -1,0 +1,22 @@
+name: lable artifact-version
+
+on: [workflow_dispatch]
+
+permissions:
+  id-token: write
+  contents: read
+  
+jobs:
+  label-artifact:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run My Custom Go Action
+        uses: ./
+        id: go-action
+        with:
+          cloudbees-url: "https://api.saas-preprod.beescloud.com"
+          artifact-id: "78f2705e-4421-4bc7-a62d-aa0acbcf7ddd"
+          labels: "new"
+          operation: "REPLACE"
