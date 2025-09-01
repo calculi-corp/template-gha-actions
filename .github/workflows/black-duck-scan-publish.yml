@@ -1,4 +1,4 @@
-name: Blackduck scan
+name: black-duck-scan-publish
 
 on: [workflow_dispatch]
 

@@ -1,4 +1,4 @@
-name: Grype scan
+name: grype-scan-publish
 
 on: [workflow_dispatch]
 

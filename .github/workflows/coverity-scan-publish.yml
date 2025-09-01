@@ -1,4 +1,4 @@
-name: Coverity scan
+name: coverity-scan-publish
 
 on: [workflow_dispatch]
 

@@ -1,4 +1,4 @@
-name: Gosec scan
+name: gosec-scan-publish
 
 on: [workflow_dispatch]
 

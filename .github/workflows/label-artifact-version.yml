@@ -1,0 +1,40 @@
+name: label-artifact-version
+
+on: [workflow_dispatch]
+
+permissions:
+  id-token: write
+  contents: read
+  
+jobs:
+  label-artifact-version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Register Build Artifact
+        id: artifact
+        uses: cloudbees-io-gha/register-build-artifact@v3
+        with:
+          name: "artifact-demo"
+          version: 1.0.0
+          url: "ghcr.io/haakaashbee/testaction/prod-artifact:latest"
+          digest: "sha256:566b1117a16243a43be01e378a20ee823c95d00cd5f3231ad4d168f53d99d9d8"
+          type: "docker"
+          label: 'QA,production'
+
+      - name: Test output
+        run: echo '${{ steps.artifact.outputs.cbp_artifact_id }}'
+
+      - name: Add labels
+        uses: cloudbees-io-gha/label-artifact-version@v1
+        with:
+          artifact-id: ${{ steps.artifact.outputs.cbp_artifact_id }}
+          labels: "stagging"
+
+      - name: Notify failures
+        if: ${{ failure() }}
+        uses: ./actions/notify-slack-action
+        with:
+          webhook-url: ${{ secrets.CBP_BT_SLACK_WEBHOOK_URL }}
+          action-name: label-artifact-version
