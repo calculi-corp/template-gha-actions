@@ -1,5 +1,6 @@
-kind: action
 name: Notify slack action
+description: Send a Slack notification on failure
+
 inputs:
   action-name:
     required: true
@@ -9,24 +10,18 @@ inputs:
     description: 'The Slack webhook URL'
 
 runs:
-  using: composite
+  using: "composite"
   steps:
     - name: Send failure notification to Slack
-      uses: docker://golang:1.23.0
-      # uses: docker://alpine/curl
       shell: sh
       run: |
+        REPO_URL="${{ github.server_url }}/${{ github.repository }}"
+        BRANCH="${{ github.ref_name }}"
+        # Construct the workflow file URL (adjust path as needed)
+        WORKFLOW_URL="$REPO_URL/blob/$BRANCH/.github/workflows/${{ inputs.action-name }}.yml"
 
-        REPO_URL="${{ cloudbees.scm.repositoryUrl }}"
-        # Remove the .git suffix from the repo URL (if present)
-        REPO_URL_CLEAN=${REPO_URL%.git}
-        # Construct the final URL
-        WORKFLOW_URL="$REPO_URL_CLEAN/blob/${{ cloudbees.scm.branch }}/.cloudbees/workflows/${{ inputs.action-name }}.yaml"
-
-        # Send the notification to Slack channel
         curl -X POST -H 'Content-type: application/json' --data '{
-          "text": "
-          The following action workflow run has failed. :x:",
+          "text": "The following action workflow run has failed. :x:",
           "attachments": [
             {
               "color": "#ff0000",
@@ -35,7 +30,7 @@ runs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*Action:* `${{ inputs.action-name }}`\n*Status:* Failed :warning:\n*Job:* `${{ job.id }}`\n*Workflow:* '"$WORKFLOW_URL"'\n*Branch:* `${{ cloudbees.scm.branch }}`"
+                    "text": "*Action:* `${{ inputs.action-name }}`\n*Status:* Failed :warning:\n*Job:* `${{ github.job }}`\n*Workflow:* '"$WORKFLOW_URL"'\n*Branch:* `${{ github.ref_name }}`"
                   }
                 }
               ]

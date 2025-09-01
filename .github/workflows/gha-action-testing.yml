@@ -10,9 +10,6 @@ jobs:
 
   black-duck-scan-publish:
     runs-on: ubuntu-latest
-    # permissions:
-    #   id-token: write
-    #   contents: read 
     steps:
       - name: Checkout repository code
         uses: actions/checkout@v3
@@ -37,15 +34,10 @@ jobs:
         uses: ./actions/notify-slack-action
         with:
           webhook-url: ${{ secrets.CBP_BT_SLACK_WEBHOOK_URL }}
-          # action name (as per cloudbees-io) and this file name must be action name with .yaml extension
-          # this agreement is a prerequisite to send workflow urls in slack notifications in case of failure
           action-name: black-duck-scan-publish
 
   coverity-scan-publish:
     runs-on: ubuntu-latest
-    # permissions:
-    #   id-token: write
-    #   contents: read 
     outputs:
       coverity-job-output-critical: ${{ steps.coverity-step.outputs.critical-count }}
       coverity-job-output-very-high: ${{ steps.coverity-step.outputs.very-high-count }}
@@ -78,8 +70,6 @@ jobs:
         uses: ./actions/notify-slack-action
         with:
           webhook-url: ${{ secrets.CBP_BT_SLACK_WEBHOOK_URL }}
-          # action name (as per cloudbees-io) and this file name must be action name with .yaml extension
-          # this agreement is a prerequisite to send workflow urls in slack notifications in case of failure
           action-name: coverity-scan-publish
 
       - id: print-outputs-from-coverity-step
@@ -96,9 +86,6 @@ jobs:
 
   gitleaks-scan-publish:
     runs-on: ubuntu-latest
-    # permissions:
-    #   id-token: write
-    #   contents: read 
     outputs:
       gitleaks-job-output-critical: ${{ steps.gitleaks-step.outputs.critical-count }}
       gitleaks-job-output-very-high: ${{ steps.gitleaks-step.outputs.very-high-count }}
@@ -128,8 +115,6 @@ jobs:
         uses: ./actions/notify-slack-action
         with:
           webhook-url: ${{ secrets.CBP_BT_SLACK_WEBHOOK_URL }}
-          # action name (as per cloudbees-io) and this file name must be action name with .yaml extension
-          # this agreement is a prerequisite to send workflow urls in slack notifications in case of failure
           action-name: gitleaks-scan-publish
 
       - id: print-outputs-from-gitleaks-step
@@ -146,9 +131,6 @@ jobs:
 
   gosec-scan-publish:
     runs-on: ubuntu-latest
-    # permissions:
-    #   id-token: write
-    #   contents: read  
     outputs:
       gosec-job-output-critical: ${{ steps.gosec-step.outputs.critical-count }}
       gosec-job-output-very-high: ${{ steps.gosec-step.outputs.very-high-count }}
@@ -176,8 +158,6 @@ jobs:
         uses: ./actions/notify-slack-action
         with:
           webhook-url: ${{ secrets.CBP_BT_SLACK_WEBHOOK_URL }}
-          # action name (as per cloudbees-io) and this file name must be action name with .yaml extension
-          # this agreement is a prerequisite to send workflow urls in slack notifications in case of failure
           action-name: gosec-scan-publish
 
       - id: print-outputs-from-gosec-step
@@ -194,9 +174,6 @@ jobs:
 
   grype-scan-publish:
     runs-on: ubuntu-latest
-    # permissions:
-    #   id-token: write
-    #   contents: read  
     outputs:
       grype-job-output-critical: ${{ steps.grype-step.outputs.critical-count }}
       grype-job-output-very-high: ${{ steps.grype-step.outputs.very-high-count }}
@@ -225,7 +202,6 @@ jobs:
         run: |
           docker build -t myapp:latest .
 
-      # Step 4: Save the Docker image as a TAR file
       - name: Save Docker image as TAR file
         run: |
           docker save -o output.tar myapp:latest
@@ -242,8 +218,6 @@ jobs:
         uses: ./actions/notify-slack-action
         with:
           webhook-url: ${{ secrets.CBP_BT_SLACK_WEBHOOK_URL }}
-          # action name (as per cloudbees-io) and this file name must be action name with .yaml extension
-          # this agreement is a prerequisite to send workflow urls in slack notifications in case of failure
           action-name: grype-scan-publish
 
       - id: print-outputs-from-grype-step
@@ -260,9 +234,6 @@ jobs:
 
   trivy-scan-publish:
     runs-on: ubuntu-latest 
-    # permissions:
-    #   id-token: write
-    #   contents: read 
     outputs:
       trivy-job-output-critical: ${{ steps.trivy-step.outputs.critical-count }}
       trivy-job-output-very-high: ${{ steps.trivy-step.outputs.very-high-count }}
@@ -291,7 +262,6 @@ jobs:
         run: |
           docker build -t myapp:latest .
 
-      # Step 4: Save the Docker image as a TAR file
       - name: Save Docker image as TAR file
         run: |
           docker save -o output.tar myapp:latest
@@ -311,8 +281,6 @@ jobs:
         uses: ./actions/notify-slack-action
         with:
           webhook-url: ${{ secrets.CBP_BT_SLACK_WEBHOOK_URL }}
-          # action name (as per cloudbees-io) and this file name must be action name with .yaml extension
-          # this agreement is a prerequisite to send workflow urls in slack notifications in case of failure
           action-name: trivy-scan-publish
 
       - id: print-outputs-from-trivy-step
@@ -329,42 +297,24 @@ jobs:
 
   publish-evidence-item:
     runs-on: ubuntu-latest
-    # permissions:
-    #   id-token: write
-    #   contents: read
-    steps:
-      - name : Step-1
-        run: echo "hello from step 1"
-        
+    steps:        
       - name: Checkout
         uses: actions/checkout@v3
 
       - name: Publish evidence to Platform
         uses: cloudbees-io-gha/publish-evidence-item@v2
         with:
-          # The CloudBees platform URL.
-          # cloudbees-url: # optional, default is https://api.cloudbees.io
-          # The CloudBees platform personal access token.
-          # cloudbees-pat: ${{ secrets.PROD_PAT }}
-          # The content to be published as evidence.
           content: "Evidence : PROD-Validation-test"
-          # The format of the evidence content.
-          # format: # optional
       
       - name: Notify failures
         if: ${{ failure() }}
         uses: ./actions/notify-slack-action
         with:
           webhook-url: ${{ secrets.CBP_BT_SLACK_WEBHOOK_URL }}
-          # action name (as per cloudbees-io) and this file name must be action name with .yaml extension
-          # this agreement is a prerequisite to send workflow urls in slack notifications in case of failure
           action-name: publish-evidence-item
 
   register-build-artifact:
     runs-on: ubuntu-latest
-    # permissions:
-    #   id-token: write
-    #   contents: read
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -408,30 +358,35 @@ jobs:
 
       - name: Notify failures
         if: ${{ failure() }}
-        uses: ./actions/new
+        uses: ./actions/notify-slack-action
         with:
           webhook-url: ${{ secrets.CBP_BT_SLACK_WEBHOOK_URL }}
-          # action name (as per cloudbees-io) and this file name must be action name with .yaml extension
-          # this agreement is a prerequisite to send workflow urls in slack notifications in case of failure
           action-name: label-artifact-version
 
-  # publish-test-results:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout Repository
-  #       uses: actions/checkout@v3
-  #       with:
-  #         repository: apache/commons-lang
+  publish-test-results:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          repository: apache/commons-lang
           
-  #     - name: Run Tests with Maven
-  #       run: |
-  #         mvn test -Dtest=StringUtilsTest
-  #         ls -lrt
+      - name: Run Tests with Maven
+        run: |
+          mvn test -Dtest=StringUtilsTest
+          ls -lrt
           
-  #     - name: Upload Test Results to GitHub Artifacts
-  #       uses: actions/upload-artifact@v4.6.2
-  #       with:
-  #         name: test-results
-  #         path: target/surefire-reports/*
+      - name: Upload Test Results to GitHub Artifacts
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: test-results
+          path: target/surefire-reports/*
+
+      - name: Notify failures
+        if: ${{ failure() }}
+        uses: ./actions/notify-slack-action
+        with:
+          webhook-url: ${{ secrets.CBP_BT_SLACK_WEBHOOK_URL }}
+          action-name: publish-test-results
 
         
