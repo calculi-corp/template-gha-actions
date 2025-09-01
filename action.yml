@@ -1,4 +1,3 @@
-apiVersion: automation.cloudbees.io/v1alpha1
 kind: action
 name: Notify slack action
 inputs:
@@ -14,6 +13,7 @@ runs:
   steps:
     - name: Send failure notification to Slack
       uses: docker://golang:1.23.0
+      # uses: docker://alpine/curl
       shell: sh
       run: |
 
