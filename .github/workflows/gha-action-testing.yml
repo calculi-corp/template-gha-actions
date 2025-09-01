@@ -351,7 +351,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-
       - name: Register Build Artifact
         id: artifact
         uses: cloudbees-io-gha/register-build-artifact@v3
@@ -363,20 +362,20 @@ jobs:
           type: "docker"
           label: 'QA,production'
 
-      - name: Add labels
-        uses: cloudbees-io-gha/label-artifact-version@v1
-        id: artifact
-        with:
-          artifact-id: ${{ steps.artifact.outputs.cbp_artifact_id }}
-          labels: "new"
+      # - name: Add labels
+      #   uses: cloudbees-io-gha/label-artifact-version@v1
+      #   id: artifact
+      #   with:
+      #     artifact-id: ${{ steps.artifact.outputs.cbp_artifact_id }}
+      #     labels: "new"
 
-      - name: Remove label
-        uses: cloudbees-io-gha/label-artifact-version@v1
-        id: artifact
-        with:
-          artifact-id: ${{ steps.artifact.outputs.cbp_artifact_id }}
-          labels: "new"
-          operation: "REMOVE"
+      # - name: Remove label
+      #   uses: cloudbees-io-gha/label-artifact-version@v1
+      #   id: artifact
+      #   with:
+      #     artifact-id: ${{ steps.artifact.outputs.cbp_artifact_id }}
+      #     labels: "new"
+      #     operation: "REMOVE"
 
       - name: Notify failures
         if: ${{ failure() }}
