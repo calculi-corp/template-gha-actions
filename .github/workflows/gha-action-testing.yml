@@ -1,6 +1,10 @@
 name: GHA action testing
 
-on: [workflow_dispatch, push]
+on: push
+# on:
+#   workflow_dispatch:    # Manual trigger
+#   schedule:             # Scheduled trigger (uncomment to use)
+#     - cron: '30 1 * * *' # Every day at 1:30 AM UTC
 
 permissions:
   id-token: write
