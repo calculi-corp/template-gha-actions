@@ -364,12 +364,14 @@ jobs:
 
       - name: Test output
         run: echo '${{ steps.artifact.outputs.cbp_artifact_id }}'
-      # - name: Add labels
-      #   uses: cloudbees-io-gha/label-artifact-version@v1
-      #   id: "artifact"
-      #   with:
-      #     artifact-id: ${{ steps.artifact.outputs.cbp_artifact_id }}
-      #     labels: "new"
+
+      - name: Add labels
+        uses: cloudbees-io-gha/label-artifact-version@v1
+        id: "artifact"
+        with:
+          artifact-id: ${{ steps.artifact.outputs.cbp_artifact_id }}
+          labels: "new"
+          operation: "ADD"
 
       # - name: Remove label
       #   uses: cloudbees-io-gha/label-artifact-version@v1
@@ -386,30 +388,30 @@ jobs:
           webhook-url: ${{ secrets.CBP_BT_SLACK_WEBHOOK_URL }}
           action-name: label-artifact-version
 
-  publish-test-results:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-        with:
-          repository: apache/commons-lang
+  # publish-test-results:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout Repository
+  #       uses: actions/checkout@v3
+  #       with:
+  #         repository: apache/commons-lang
           
-      - name: Run Tests with Maven
-        run: |
-          mvn test -Dtest=StringUtilsTest
-          ls -lrt
+  #     - name: Run Tests with Maven
+  #       run: |
+  #         mvn test -Dtest=StringUtilsTest
+  #         ls -lrt
           
-      - name: Upload Test Results to GitHub Artifacts
-        uses: actions/upload-artifact@v4.6.2
-        with:
-          name: test-results
-          path: target/surefire-reports/*
+  #     - name: Upload Test Results to GitHub Artifacts
+  #       uses: actions/upload-artifact@v4.6.2
+  #       with:
+  #         name: test-results
+  #         path: target/surefire-reports/*
 
-      - name: Notify failures
-        if: ${{ failure() }}
-        uses: ./actions/notify-slack-action
-        with:
-          webhook-url: ${{ secrets.CBP_BT_SLACK_WEBHOOK_URL }}
-          action-name: publish-test-results
+  #     - name: Notify failures
+  #       if: ${{ failure() }}
+  #       uses: ./actions/notify-slack-action
+  #       with:
+  #         webhook-url: ${{ secrets.CBP_BT_SLACK_WEBHOOK_URL }}
+  #         action-name: publish-test-results
 
         
