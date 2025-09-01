@@ -367,7 +367,6 @@ jobs:
 
       - name: Add labels
         uses: cloudbees-io-gha/label-artifact-version@v1
-        id: "artifact"
         with:
           artifact-id: ${{ steps.artifact.outputs.cbp_artifact_id }}
           labels: "new"
