@@ -352,7 +352,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Register Build Artifact
-        id: artifact
+        id: "artifact"
         uses: cloudbees-io-gha/register-build-artifact@v3
         with:
           name: "artifact-demo"
@@ -364,7 +364,7 @@ jobs:
 
       - name: Add labels
         uses: cloudbees-io-gha/label-artifact-version@v1
-        id: artifact
+        id: "artifact"
         with:
           artifact-id: ${{ steps.artifact.outputs.cbp_artifact_id }}
           labels: "new"
