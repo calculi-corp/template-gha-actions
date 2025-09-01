@@ -351,14 +351,32 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run My Custom Go Action
-        uses: ./
-        id: go-action
+
+      - name: Register Build Artifact
+        id: artifact
+        uses: cloudbees-io-gha/register-build-artifact@v3
         with:
-          cloudbees-url: "https://api.saas-preprod.beescloud.com"
-          artifact-id: "78f2705e-4421-4bc7-a62d-aa0acbcf7ddd"
+          name: "artifact-demo"
+          version: 1.0.0
+          url: "ghcr.io/haakaashbee/testaction/prod-artifact:latest"
+          digest: "sha256:566b1117a16243a43be01e378a20ee823c95d00cd5f3231ad4d168f53d99d9d8"
+          type: "docker"
+          label: 'QA,production'
+
+      - name: Add labels
+        uses: cloudbees-io-gha/label-artifact-version@v1
+        id: artifact
+        with:
+          artifact-id: ${{ steps.artifact.outputs.cbp_artifact_id }}
           labels: "new"
-          operation: "REPLACE"
+
+      - name: Remove label
+        uses: cloudbees-io-gha/label-artifact-version@v1
+        id: artifact
+        with:
+          artifact-id: ${{ steps.artifact.outputs.cbp_artifact_id }}
+          labels: "new"
+          operation: "REMOVE"
 
       - name: Notify failures
         if: ${{ failure() }}
