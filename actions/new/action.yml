@@ -1,0 +1,38 @@
+name: 'Failure notification'
+description: 'Send a webhook notification when a step fails'
+inputs:
+  webhook-url:
+    description: 'The webhook URL to notify'
+    required: true
+  action-name:
+    description: 'The name of the failed step'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - run: |
+        REPO_URL="${{ cloudbees.scm.repositoryUrl }}"
+        # Remove the .git suffix from the repo URL (if present)
+        REPO_URL_CLEAN=${REPO_URL%.git}
+        # Construct the final URL
+        WORKFLOW_URL="$REPO_URL_CLEAN/blob/${{ cloudbees.scm.branch }}/.cloudbees/workflows/${{ inputs.action-name }}.yml"
+
+        # Send the notification to Slack channel
+        curl -X POST -H 'Content-type: application/json' --data '{
+          "text": "
+          The following action workflow run has failed. :x:",
+          "attachments": [
+            {
+              "color": "#ff0000",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Action:* `${{ inputs.action-name }}`\n*Status:* Failed :warning:\n*Job:* `${{ job.id }}`\n*Workflow:* '"$WORKFLOW_URL"'\n*Branch:* `${{ cloudbees.scm.branch }}`"
+                  }
+                }
+              ]
+            }
+          ]
+        }' ${{ inputs.webhook-url }}

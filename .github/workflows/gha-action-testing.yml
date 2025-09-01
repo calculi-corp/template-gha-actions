@@ -408,7 +408,7 @@ jobs:
 
       - name: Notify failures
         if: ${{ failure() }}
-        uses: ./actions/notify-slack-action
+        uses: ./actions/new
         with:
           webhook-url: ${{ secrets.CBP_BT_SLACK_WEBHOOK_URL }}
           # action name (as per cloudbees-io) and this file name must be action name with .yaml extension
