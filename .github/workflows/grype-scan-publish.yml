@@ -47,7 +47,6 @@ jobs:
         uses: cloudbees-io-gha/grype-scan-publish@v1
         with:
           binary-tar-path: output.tar
-          cloudbees-url: "https://api.saas-preprod.beescloud.com/"
 
       - id: print-outputs-from-grype-step
         name: Print outputs from upstream grype step
