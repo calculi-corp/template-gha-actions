@@ -60,6 +60,7 @@ jobs:
             echo "Outputs from upstream grype step:"
             echo "Critical Count: ${{steps.grype-step.outputs.critical-count}}"
             echo "Very High Count: ${{steps.grype-step.outputs.very-high-count}}"
+            
             echo "High Count: ${{steps.grype-step.outputs.high-count}}"
             echo "Medium Count: ${{steps.grype-step.outputs.medium-count}}"
             echo "Low Count: ${{steps.grype-step.outputs.low-count}}"
