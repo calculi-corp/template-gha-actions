@@ -1,10 +1,10 @@
 name: Test Notification Action
 
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - '**'
+# on:
+#   workflow_dispatch:
+#   push:
+#     branches:
+#       - '**'
 
 jobs:
   failure-notification:

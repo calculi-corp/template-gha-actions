@@ -4,9 +4,9 @@ on:
   workflow_dispatch:     # Manual trigger
   schedule:              # Scheduled trigger (uncomment to use)
     - cron: '30 1 * * *' # Every day at 1:30 AM UTC
-  # push:                  # Push trigger
-  #   branches:
-  #     - main
+  push:                  # Push trigger
+    branches:
+      - '**'
 
 permissions:
   id-token: write
@@ -37,10 +37,12 @@ jobs:
 
       - name: Notify failures
         if: ${{ failure() }}
-        uses: ./actions/notify-slack-action/failure
+        uses: ./actions/notify-slack-action
         with:
           webhook-url: ${{ secrets.CBP_BT_SLACK_WEBHOOK_URL }}
           action-name: black-duck-scan-publish
+          success: 'false'
+          workflow-name: gha-action-testing
 
   coverity-scan-publish:
     runs-on: ubuntu-latest
@@ -73,10 +75,12 @@ jobs:
 
       - name: Notify failures
         if: ${{ failure() }}
-        uses: ./actions/notify-slack-action/failure
+        uses: ./actions/notify-slack-action
         with:
           webhook-url: ${{ secrets.CBP_BT_SLACK_WEBHOOK_URL }}
           action-name: coverity-scan-publish
+          success: 'false'
+          workflow-name: gha-action-testing
 
       - id: print-outputs-from-coverity-step
         name: Print outputs from upstream coverity step
@@ -118,10 +122,12 @@ jobs:
 
       - name: Notify failures
         if: ${{ failure() }}
-        uses: ./actions/notify-slack-action/failure
+        uses: ./actions/notify-slack-action
         with:
           webhook-url: ${{ secrets.CBP_BT_SLACK_WEBHOOK_URL }}
           action-name: gitleaks-scan-publish
+          success: 'false'
+          workflow-name: gha-action-testing
 
       - id: print-outputs-from-gitleaks-step
         name: Print outputs from upstream gitleaks step
@@ -161,10 +167,12 @@ jobs:
 
       - name: Notify failures
         if: ${{ failure() }}
-        uses: ./actions/notify-slack-action/failure
+        uses: ./actions/notify-slack-action
         with:
           webhook-url: ${{ secrets.CBP_BT_SLACK_WEBHOOK_URL }}
           action-name: gosec-scan-publish
+          success: 'false'
+          workflow-name: gha-action-testing
 
       - id: print-outputs-from-gosec-step
         name: Print outputs from upstream gosec step
@@ -221,10 +229,12 @@ jobs:
 
       - name: Notify failures
         if: ${{ failure() }}
-        uses: ./actions/notify-slack-action/failure
+        uses: ./actions/notify-slack-action
         with:
           webhook-url: ${{ secrets.CBP_BT_SLACK_WEBHOOK_URL }}
           action-name: grype-scan-publish
+          success: 'false'
+          workflow-name: gha-action-testing
 
       - id: print-outputs-from-grype-step
         name: Print outputs from upstream grype step
@@ -288,6 +298,8 @@ jobs:
         with:
           webhook-url: ${{ secrets.CBP_BT_SLACK_WEBHOOK_URL }}
           action-name: trivy-scan-publish
+          success: 'false'
+          workflow-name: gha-action-testing
 
       - id: print-outputs-from-trivy-step
         name: Print outputs from upstream trivy step
@@ -318,6 +330,7 @@ jobs:
         with:
           webhook-url: ${{ secrets.CBP_BT_SLACK_WEBHOOK_URL }}
           action-name: publish-evidence-item
+          success: 'false'
 
   register-build-artifact:
     runs-on: ubuntu-latest
@@ -341,9 +354,9 @@ jobs:
         uses: ./actions/notify-slack-action
         with:
           webhook-url: ${{ secrets.CBP_BT_SLACK_WEBHOOK_URL }}
-          # action name (as per cloudbees-io) and this file name must be action name with .yaml extension
-          # this agreement is a prerequisite to send workflow urls in slack notifications in case of failure
           action-name: register-build-artifact
+          success: 'false'
+          workflow-name: gha-action-testing
 
       - name: Test output
         run: echo '${{ steps.artifact.outputs.cbp_artifact_id }}'
@@ -379,6 +392,8 @@ jobs:
         with:
           webhook-url: ${{ secrets.CBP_BT_SLACK_WEBHOOK_URL }}
           action-name: label-artifact-version
+          success: 'false'
+          workflow-name: gha-action-testing
 
   publish-test-results:
     runs-on: ubuntu-latest
@@ -393,11 +408,11 @@ jobs:
           mvn test -Dtest=StringUtilsTest
           ls -lrt
           
-      - name: Upload Test Results to GitHub Artifacts
-        uses: actions/upload-artifact@v4.6.2
+      - name: Publish test results in Cloudbees platform
+        uses: cloudbees-io-gha/publish-test-results@v2
         with:
-          name: test-results
-          path: target/surefire-reports/*
+          test-type: JUNIT
+          results-path: target/surefire-reports/*
 
       - name: Notify failures
         if: ${{ failure() }}
@@ -405,5 +420,32 @@ jobs:
         with:
           webhook-url: ${{ secrets.CBP_BT_SLACK_WEBHOOK_URL }}
           action-name: publish-test-results
-
+          success: 'false'
+          workflow-name: gha-action-testing
         
+
+  success-notification:
+    runs-on: ubuntu-latest
+    needs:
+      - black-duck-scan-publish
+      - coverity-scan-publish
+      - gitleaks-scan-publish
+      - gosec-scan-publish
+      - grype-scan-publish
+      - trivy-scan-publish
+      - publish-evidence-item
+      - register-build-artifact
+      - label-artifact-version
+      - publish-test-results
+  
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v3
+      
+      - name: Notify success
+        uses: ./actions/notify-slack-action
+        with:
+          webhook-url: ${{ secrets.CBP_BT_SLACK_WEBHOOK_URL }}
+          action-name: All GHA actions
+          success: 'true'
+          workflow-name: gha-action-testing

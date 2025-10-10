@@ -11,6 +11,9 @@ inputs:
   success:
     required: true
     description: 'Set to true for success notification, false for failure'
+  workflow-name:
+    required: true
+    description: 'The name of the workflow'
 
 runs:
   using: "composite"
@@ -20,7 +23,7 @@ runs:
       run: |
         REPO_URL="${{ github.server_url }}/${{ github.repository }}"
         BRANCH="${{ github.ref_name }}"
-        WORKFLOW_URL="$REPO_URL/blob/$BRANCH/.github/workflows/${{ inputs.action-name }}.yml"
+        WORKFLOW_URL="$REPO_URL/blob/$BRANCH/.github/workflows/${{ inputs.workflow-name }}.yml"
 
         if [ "${{ inputs.success }}" = "true" ]; then
           STATUS_TEXT="All jobs in the workflow have succeeded! :tada:"
