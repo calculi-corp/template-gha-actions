@@ -1,0 +1,36 @@
+name: Test Notification Action
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  failure-notification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deliberately fail
+        run: exit 1
+
+      - name: Send failure notification
+        if: ${{ failure() }}
+        uses: ./actions/notify-slack-action
+        with:
+          webhook-url: ${{ secrets.CBP_BT_SLACK_WEBHOOK_URL }}
+          action-name: test-failure
+          success: 'false'
+
+  success-notification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Succeed
+        run: echo "Success!"
+
+      - name: Send success notification
+        if: ${{ success() }}
+        uses: ./actions/notify-slack-action
+        with:
+          webhook-url: ${{ secrets.CBP_BT_SLACK_WEBHOOK_URL }}
+          action-name: test-success
+          success: 'true'
