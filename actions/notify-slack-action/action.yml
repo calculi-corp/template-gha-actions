@@ -32,20 +32,38 @@ runs:
           STATUS="Failed :warning:"
         fi
 
-        curl -X POST -H 'Content-type: application/json' --data '{
-          "text": "$STATUS_TEXT",
-          "attachments": [
+        curl -X POST -H 'Content-type: application/json' --data "{
+          \"text\": \"$STATUS_TEXT\",
+          \"attachments\": [
             {
-              "color": "$COLOR",
-              "blocks": [
+              \"color\": \"$COLOR\",
+              \"blocks\": [
                 {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*Action:* `${{ inputs.action-name }}`\n*Status:* $STATUS\n*Job:* `${{ github.job }}`\n*Workflow:* '"$WORKFLOW_URL"'\n*Branch:* `${{ github.ref_name }}`"
+                  \"type\": \"section\",
+                  \"text\": {
+                    \"type\": \"mrkdwn\",
+                    \"text\": \"*Action:* '${{ inputs.action-name }}'\n*Status:* $STATUS\n*Job:* '${{ github.job }}'\n*Workflow:* '$WORKFLOW_URL'\n*Branch:* '${{ github.ref_name }}'\"
                   }
                 }
               ]
             }
           ]
-        }' ${{ inputs.webhook-url }}
+        }" ${{ inputs.webhook-url }}
+        
+        # curl -X POST -H 'Content-type: application/json' --data '{
+        #   "text": "$STATUS_TEXT",
+        #   "attachments": [
+        #     {
+        #       "color": "$COLOR",
+        #       "blocks": [
+        #         {
+        #           "type": "section",
+        #           "text": {
+        #             "type": "mrkdwn",
+        #             "text": "*Action:* `${{ inputs.action-name }}`\n*Status:* $STATUS\n*Job:* `${{ github.job }}`\n*Workflow:* '"$WORKFLOW_URL"'\n*Branch:* `${{ github.ref_name }}`"
+        #           }
+        #         }
+        #       ]
+        #     }
+        #   ]
+        # }' ${{ inputs.webhook-url }}
