@@ -4,9 +4,9 @@ on:
   workflow_dispatch:     # Manual trigger
   schedule:              # Scheduled trigger (uncomment to use)
     - cron: '30 1 * * *' # Every day at 1:30 AM UTC
-  push:                  # Push trigger
-    branches:
-      - '**'
+  # push:                  # Push trigger
+  #   branches:
+  #     - '**'
 
 permissions:
   id-token: write
