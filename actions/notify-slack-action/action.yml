@@ -1,5 +1,5 @@
 name: Notify slack action
-description: Send a Slack notification on failure
+description: Send a Slack notification on workflow result
 
 inputs:
   action-name:
@@ -8,32 +8,65 @@ inputs:
   webhook-url:
     required: true
     description: 'The Slack webhook URL'
+  success:
+    required: true
+    description: 'Set to true for success notification, false for failure'
+  workflow-name:
+    required: true
+    description: 'The name of the workflow'
 
 runs:
   using: "composite"
   steps:
-    - name: Send failure notification to Slack
+    - name: Send notification to Slack
       shell: sh
       run: |
         REPO_URL="${{ github.server_url }}/${{ github.repository }}"
         BRANCH="${{ github.ref_name }}"
-        # Construct the workflow file URL (adjust path as needed)
-        WORKFLOW_URL="$REPO_URL/blob/$BRANCH/.github/workflows/${{ inputs.action-name }}.yml"
+        WORKFLOW_URL="$REPO_URL/blob/$BRANCH/.github/workflows/${{ inputs.workflow-name }}.yml"
 
-        curl -X POST -H 'Content-type: application/json' --data '{
-          "text": "The following action workflow run has failed. :x:",
-          "attachments": [
+        if [ "${{ inputs.success }}" = "true" ]; then
+          STATUS_TEXT="All jobs in the workflow have succeeded! :tada:"
+          COLOR="#36a64f"
+          STATUS="Success :white_check_mark:"
+        else
+          STATUS_TEXT="The following action in the workflow run has failed. :x:"
+          COLOR="#ff0000"
+          STATUS="Failed :warning:"
+        fi
+
+        curl -X POST -H 'Content-type: application/json' --data "{
+          \"text\": \"$STATUS_TEXT\",
+          \"attachments\": [
             {
-              "color": "#ff0000",
-              "blocks": [
+              \"color\": \"$COLOR\",
+              \"blocks\": [
                 {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*Action:* `${{ inputs.action-name }}`\n*Status:* Failed :warning:\n*Job:* `${{ github.job }}`\n*Workflow:* '"$WORKFLOW_URL"'\n*Branch:* `${{ github.ref_name }}`"
+                  \"type\": \"section\",
+                  \"text\": {
+                    \"type\": \"mrkdwn\",
+                    \"text\": \"*Action:* '${{ inputs.action-name }}'\n*Status:* $STATUS\n*Job:* '${{ github.job }}'\n*Workflow:* '$WORKFLOW_URL'\n*Branch:* '${{ github.ref_name }}'\"
                   }
                 }
               ]
             }
           ]
-        }' ${{ inputs.webhook-url }}
+        }" ${{ inputs.webhook-url }}
+        
+        # curl -X POST -H 'Content-type: application/json' --data '{
+        #   "text": "$STATUS_TEXT",
+        #   "attachments": [
+        #     {
+        #       "color": "$COLOR",
+        #       "blocks": [
+        #         {
+        #           "type": "section",
+        #           "text": {
+        #             "type": "mrkdwn",
+        #             "text": "*Action:* `${{ inputs.action-name }}`\n*Status:* $STATUS\n*Job:* `${{ github.job }}`\n*Workflow:* '"$WORKFLOW_URL"'\n*Branch:* `${{ github.ref_name }}`"
+        #           }
+        #         }
+        #       ]
+        #     }
+        #   ]
+        # }' ${{ inputs.webhook-url }}
